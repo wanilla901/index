@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ВКонтакте 2007 года</title>
+    <title>Помощник с калькулятором в стиле ВКонтакте 2007 года</title>
     <style>
         body {
             background-color: #e6e6e6; /* Светлый фон */
@@ -111,9 +111,6 @@
             color: #777; /* Светло-серый цвет текста */
         }
     </style>
-    <!-- Подключение Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com.firebasejs/9.6.1/firebase-firestore.js"></script>
 </head>
 <body>
     <h1>Помощник с калькулятором</h1>
@@ -153,20 +150,7 @@
     </div>
 
     <script>
-        // Инициализация Firebase
-        const firebaseConfig = {
-            apiKey: "YOUR_API_KEY", // Замените YOUR_API_KEY на ваш API ключ
-            authDomain: "YOUR_AUTH_DOMAIN", // Замените YOUR_AUTH_DOMAIN на ваш домен аутентификации
-            projectId: "YOUR_PROJECT_ID", // Замените YOUR_PROJECT_ID на ID вашего проекта
-            storageBucket: "YOUR_STORAGE_BUCKET", // Замените YOUR_STORAGE_BUCKET на ваш бакет
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID", // Замените YOUR_MESSAGING_SENDER_ID на ID отправителя сообщений
-            appId: "YOUR_APP_ID" // Замените YOUR_APP_ID на ID вашего приложения
-        };
-
-        const app = firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-
-        // Загружаем сохраненные сообщения, профили и посты из Firestore при загрузке страницы
+        // Загружаем сохраненные сообщения, профили и посты из local storage при загрузке страницы
         window.onload = function() {
             loadMessages();
             loadProfiles();
@@ -176,167 +160,184 @@
         // Функция для публикации сообщения
         function postMessage() {
             const messageInput = document.getElementById("messageInput").value;
+            const messages = JSON.parse(localStorage.getItem("messages")) || [];
 
-            // Добавление нового сообщения в Firestore
-            db.collection("messages").add({
-                text: messageInput,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            }).then(() => {
-                displayMessages();
-                document.getElementById("messageInput").value = ""; // очищаем поле ввода
-            }).catch(error => {
-                console.error("Ошибка добавления сообщения: ", error);
-            });
+            // Создание нового сообщения
+            messages.push(messageInput);
+            localStorage.setItem("messages", JSON.stringify(messages));
+            displayMessages();
+            document.getElementById("messageInput").value = ""; // очищаем поле ввода
         }
 
         // Функция для отображения сообщений
         function displayMessages() {
             const messagesBoard = document.getElementById("messages");
             messagesBoard.innerHTML = ""; // очищаем текущее содержание
+            const messages = JSON.parse(localStorage.getItem("messages")) || [];
 
-            // Получение сообщений из Firestore
-            db.collection("messages").orderBy("timestamp").onSnapshot(snapshot => {
-                snapshot.forEach(doc => {
-                    const message = doc.data().text;
-                    const newMessage = document.createElement("div");
-                    newMessage.className = "message";
-                    newMessage.textContent = message;
+            messages.forEach(function(message, index) {
+                const newMessage = document.createElement("div");
+                newMessage.className = "message";
+                newMessage.textContent = message;
 
-                    // Добавляем кнопку удаления
-                    const deleteButton = document.createElement("button");
-                    deleteButton.textContent = "Удалить";
-                    deleteButton.className = "delete-button";
-                    deleteButton.onclick = function() {
-                        deleteMessage(doc.id);
-                    };
-                    newMessage.appendChild(deleteButton);
-                    
-                    messagesBoard.appendChild(newMessage);
-                });
+                // Добавляем кнопку удаления
+                const deleteButton = document.createElement("button");
+                deleteButton.textContent = "Удалить";
+                deleteButton.className = "delete-button";
+                deleteButton.onclick = function() {
+                    deleteMessage(index);
+                };
+                newMessage.appendChild(deleteButton);
+                
+                messagesBoard.appendChild(newMessage);
             });
         }
 
         // Функция для удаления сообщения
-        function deleteMessage(id) {
-            db.collection("messages").doc(id).delete().then(() => {
-                console.log("Сообщение успешно удалено");
-            }).catch(error => {
-                console.error("Ошибка удаления сообщения: ", error);
-            });
+        function deleteMessage(index) {
+            const messages = JSON.parse(localStorage.getItem("messages")) || [];
+            messages.splice(index, 1); // Удаляем сообщение по индексу
+            localStorage.setItem("messages", JSON.stringify(messages));
+            displayMessages(); // Обновляем отображение
         }
 
         // Функция для создания профиля
         function createProfile() {
             const username = document.getElementById("username").value;
             const bio = document.getElementById("bio").value;
-            const password = document.getElementById("password").value;
-            const profilePhoto = document.getElementById("profilePhoto").files[0];
+            const password = document.getElementById("password").value; // Получаем пароль
+            const profilePhoto = document.getElementById("profilePhoto");
+            const profiles = JSON.parse(localStorage.getItem("profiles")) || [];
 
-            const storageRef = firebase.storage().ref();
-            const photoRef = storageRef.child('profilePhotos/' + profilePhoto.name);
+            // Создание нового профиля
+            const newProfile = {
+                username: username,
+                bio: bio,
+                password: password, // Сохраняем пароль
+                photo: profilePhoto.files[0] ? URL.createObjectURL(profilePhoto.files[0]) : ''
+            };
+            profiles.push(newProfile);
+            localStorage.setItem("profiles", JSON.stringify(profiles));
+            displayProfiles();
 
-            photoRef.put(profilePhoto).then(() => {
-                return photoRef.getDownloadURL();
-            }).then(url => {
-                return db.collection("profiles").add({
-                    username: username,
-                    bio: bio,
-                    password: password,
-                    photoUrl: url
-                });
-            }).then(() => {
-                displayProfiles();
-                document.getElementById("profileForm").reset(); // очищаем форму
-            }).catch(error => {
-                console.error("Ошибка создания профиля: ", error);
-            });
+            // Очищаем поля ввода
+            document.getElementById("username").value = "";
+            document.getElementById("bio").value = "";
+            document.getElementById("password").value = "";
+            document.getElementById("profilePhoto").value = "";
         }
 
         // Функция для отображения профилей
         function displayProfiles() {
-            const profilesSection = document.getElementById("profiles");
-            profilesSection.innerHTML = ""; // очищаем текущее содержание
+            const profilesBoard = document.getElementById("profiles");
+            profilesBoard.innerHTML = ""; // очищаем текущее содержание
+            const profiles = JSON.parse(localStorage.getItem("profiles")) || [];
 
-            // Получение профилей из Firestore
-            db.collection("profiles").get().then(snapshot => {
-                snapshot.forEach(doc => {
-                    const profile = doc.data();
-                    const newProfile = document.createElement("div");
-                    newProfile.className = "profile";
+            profiles.forEach(function(profile, index) {
+                const newProfile = document.createElement("div");
+                newProfile.className = "profile";
+                
+                // Создаем изображение профиля
+                const profileImage = document.createElement("img");
+                profileImage.src = profile.photo || 'https://via.placeholder.com/50'; // Задаем изображение по умолчанию
+                newProfile.appendChild(profileImage);
 
-                    newProfile.innerHTML = `
-                        <img src="${profile.photoUrl}" alt="${profile.username}">
-                        <strong>${profile.username}</strong><br>
-                        <span>${profile.bio}</span>
-                    `;
+                newProfile.innerHTML += `<strong>${profile.username}</strong><br>${profile.bio}`;
+                
+                // Добавляем кнопку удаления профиля
+                const deleteButton = document.createElement("button");
+                deleteButton.textContent = "Удалить";
+                deleteButton.className = "delete-button";
+                deleteButton.onclick = function() {
+                    deleteProfile(index);
+                };
+                newProfile.appendChild(deleteButton);
 
-                    profilesSection.appendChild(newProfile);
-                });
+                profilesBoard.appendChild(newProfile);
             });
         }
 
-        // Функция для публикации фото
+        // Функция для удаления профиля
+        function deleteProfile(index) {
+            const profiles = JSON.parse(localStorage.getItem("profiles")) || [];
+            profiles.splice(index, 1); // Удаляем профиль по индексу
+            localStorage.setItem("profiles", JSON.stringify(profiles));
+            displayProfiles(); // Обновляем отображение
+        }
+
+        // Функция для публикации фотографии
         function postPhoto() {
-            const photoInput = document.getElementById("photoInput").files[0];
+            const photoInput = document.getElementById("photoInput");
             const photoDescription = document.getElementById("photoDescription").value;
+            const posts = JSON.parse(localStorage.getItem("posts")) || [];
 
-            const storageRef = firebase.storage().ref();
-            const photoRef = storageRef.child('photos/' + photoInput.name);
-
-            photoRef.put(photoInput).then(() => {
-                return photoRef.getDownloadURL();
-            }).then(url => {
-                return db.collection("posts").add({
+            if (photoInput.files[0]) {
+                const newPost = {
                     description: photoDescription,
-                    photoUrl: url,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                });
-            }).then(() => {
+                    photo: URL.createObjectURL(photoInput.files[0])
+                };
+                posts.push(newPost);
+                localStorage.setItem("posts", JSON.stringify(posts));
                 displayPosts();
-                document.getElementById("photoForm").reset(); // очищаем форму
-            }).catch(error => {
-                console.error("Ошибка публикации фото: ", error);
+                document.getElementById("photoInput").value = ""; // очищаем поле ввода
+                document.getElementById("photoDescription").value = ""; // очищаем поле ввода
+            }
+        }
+
+        // Функция для отображения постов
+        function displayPosts() {
+            const postsBoard = document.getElementById("posts");
+            postsBoard.innerHTML = ""; // очищаем текущее содержание
+            const posts = JSON.parse(localStorage.getItem("posts")) || [];
+
+            posts.forEach(function(post, index) {
+                const newPost = document.createElement("div");
+                newPost.className = "post";
+                newPost.innerHTML = `<strong>${post.description}</strong>`;
+                
+                // Добавляем изображение поста
+                const postImage = document.createElement("img");
+                postImage.src = post.photo;
+                newPost.appendChild(postImage);
+
+                // Добавляем кнопку удаления поста
+                const deleteButton = document.createElement("button");
+                deleteButton.textContent = "Удалить";
+                deleteButton.className = "delete-button";
+                deleteButton.onclick = function() {
+                    deletePost(index);
+                };
+                newPost.appendChild(deleteButton);
+
+                postsBoard.appendChild(newPost);
             });
         }
 
-        // Функция для загрузки постов
-        function loadPosts() {
-            const postsSection = document.getElementById("posts");
-            postsSection.innerHTML = ""; // очищаем текущее содержание
-
-            db.collection("posts").orderBy("timestamp").onSnapshot(snapshot => {
-                snapshot.forEach(doc => {
-                    const post = doc.data();
-                    const newPost = document.createElement("div");
-                    newPost.className = "post";
-
-                    newPost.innerHTML = `
-                        <img src="${post.photoUrl}" alt="Фото поста">
-                        <p>${post.description}</p>
-                    `;
-
-                    postsSection.appendChild(newPost);
-                });
-            });
+        // Функция для удаления поста
+        function deletePost(index) {
+            const posts = JSON.parse(localStorage.getItem("posts")) || [];
+            posts.splice(index, 1); // Удаляем пост по индексу
+            localStorage.setItem("posts", JSON.stringify(posts));
+            displayPosts(); // Обновляем отображение
         }
 
-        // Функция для загрузки сообщений
+        // Функции для загрузки данных из local storage
         function loadMessages() {
             displayMessages();
         }
 
-        // Функция для загрузки профилей
         function loadProfiles() {
             displayProfiles();
         }
-    </script>
 
+        function loadPosts() {
+            displayPosts();
+        }
+    </script>
     <footer>
-        <p>&copy; 2024 Помощник с калькулятором. Все права защищены.</p>
+        &copy; 2024 Помощник с калькулятором
     </footer>
 </body>
-</html>
-
 </html>
 
 
