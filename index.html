@@ -229,31 +229,35 @@
 
         // Функция для отображения профилей
         function displayProfiles() {
-            const profilesBoard = document.getElementById("profiles");
-            profilesBoard.innerHTML = ""; // очищаем текущее содержание
+            const profilesSection = document.getElementById("profiles");
+            profilesSection.innerHTML = ""; // очищаем текущее содержание
             const profiles = JSON.parse(localStorage.getItem("profiles")) || [];
 
             profiles.forEach(function(profile, index) {
-                const newProfile = document.createElement("div");
-                newProfile.className = "profile";
-                
-                // Создаем изображение профиля
-                const profileImage = document.createElement("img");
-                profileImage.src = profile.photo || 'https://via.placeholder.com/50'; // Задаем изображение по умолчанию
-                newProfile.appendChild(profileImage);
+                const profileDiv = document.createElement("div");
+                profileDiv.className = "profile";
+                profileDiv.innerHTML = `<strong>${profile.username}</strong><br>${profile.bio}`;
+                if (profile.photo) {
+                    const img = document.createElement("img");
+                    img.src = profile.photo;
+                    profileDiv.appendChild(img);
+                }
 
-                newProfile.innerHTML += `<strong>${profile.username}</strong><br>${profile.bio}`;
-                
-                // Добавляем кнопку удаления профиля
+                // Кнопка удаления профиля
                 const deleteButton = document.createElement("button");
-                deleteButton.textContent = "Удалить";
+                deleteButton.textContent = "Удалить профиль";
                 deleteButton.className = "delete-button";
                 deleteButton.onclick = function() {
-                    deleteProfile(index);
+                    const passwordInput = prompt("Введите пароль для подтверждения удаления профиля:");
+                    if (passwordInput === profile.password) {
+                        deleteProfile(index);
+                    } else {
+                        alert("Неверный пароль. Профиль не удален.");
+                    }
                 };
-                newProfile.appendChild(deleteButton);
+                profileDiv.appendChild(deleteButton);
 
-                profilesBoard.appendChild(newProfile);
+                profilesSection.appendChild(profileDiv);
             });
         }
 
@@ -265,51 +269,102 @@
             displayProfiles(); // Обновляем отображение
         }
 
-        // Функция для публикации фотографии
+        // Функция для публикации фото
         function postPhoto() {
             const photoInput = document.getElementById("photoInput");
             const photoDescription = document.getElementById("photoDescription").value;
             const posts = JSON.parse(localStorage.getItem("posts")) || [];
 
-            if (photoInput.files[0]) {
-                const newPost = {
-                    description: photoDescription,
-                    photo: URL.createObjectURL(photoInput.files[0])
-                };
-                posts.push(newPost);
-                localStorage.setItem("posts", JSON.stringify(posts));
-                displayPosts();
-                document.getElementById("photoInput").value = ""; // очищаем поле ввода
-                document.getElementById("photoDescription").value = ""; // очищаем поле ввода
+            // Проверяем, создали ли пользователь профиль
+            const profiles = JSON.parse(localStorage.getItem("profiles")) || [];
+            if (profiles.length === 0) {
+                alert("Вы должны создать профиль для публикации фото.");
+                return; // Прерываем выполнение функции, если нет профиля
             }
+
+            // Создание нового поста
+            const newPost = {
+                description: photoDescription,
+                photo: photoInput.files[0] ? URL.createObjectURL(photoInput.files[0]) : '',
+                password: profiles[0].password // Сохраняем пароль профиля для проверки
+            };
+            posts.push(newPost);
+            localStorage.setItem("posts", JSON.stringify(posts));
+            displayPosts();
+
+            // Очищаем поля ввода
+            document.getElementById("photoInput").value = "";
+            document.getElementById("photoDescription").value = "";
         }
 
         // Функция для отображения постов
         function displayPosts() {
-            const postsBoard = document.getElementById("posts");
-            postsBoard.innerHTML = ""; // очищаем текущее содержание
+            const postsSection = document.getElementById("posts");
+            postsSection.innerHTML = ""; // очищаем текущее содержание
             const posts = JSON.parse(localStorage.getItem("posts")) || [];
 
             posts.forEach(function(post, index) {
-                const newPost = document.createElement("div");
-                newPost.className = "post";
-                newPost.innerHTML = `<strong>${post.description}</strong>`;
-                
-                // Добавляем изображение поста
-                const postImage = document.createElement("img");
-                postImage.src = post.photo;
-                newPost.appendChild(postImage);
+                const postDiv = document.createElement("div");
+                postDiv.className = "post";
+                postDiv.innerHTML = `<p>${post.description}</p>`;
+                if (post.photo) {
+                    const img = document.createElement("img");
+                    img.src = post.photo;
+                    postDiv.appendChild(img);
+                }
 
-                // Добавляем кнопку удаления поста
+                // Комментарии
+                const commentsSection = document.createElement("div");
+                commentsSection.className = "comments-section";
+
+                // Форма для добавления комментария
+                const commentForm = document.createElement("form");
+                commentForm.onsubmit = function(event) {
+                    event.preventDefault();
+                    addComment(index, commentInput.value);
+                    commentInput.value = ""; // очищаем поле ввода
+                };
+                
+                const commentInput = document.createElement("input");
+                commentInput.type = "text";
+                commentInput.placeholder = "Напишите комментарий"; 
+                commentForm.appendChild(commentInput);
+                
+                const commentButton = document.createElement("input");
+                commentButton.type = "submit";
+                commentButton.value = "Комментировать";
+                commentForm.appendChild(commentButton);
+
+                // Отображаем комментарии
+                const commentList = document.createElement("div");
+                commentList.className = "comment-list";
+                post.comments = post.comments || [];
+                post.comments.forEach(function(comment) {
+                    const commentDiv = document.createElement("div");
+                    commentDiv.className = "comment";
+                    commentDiv.textContent = comment;
+                    commentList.appendChild(commentDiv);
+                });
+
+                commentsSection.appendChild(commentForm);
+                commentsSection.appendChild(commentList);
+                postDiv.appendChild(commentsSection);
+
+                // Кнопка удаления поста
                 const deleteButton = document.createElement("button");
-                deleteButton.textContent = "Удалить";
+                deleteButton.textContent = "Удалить пост";
                 deleteButton.className = "delete-button";
                 deleteButton.onclick = function() {
-                    deletePost(index);
+                    const passwordInput = prompt("Введите пароль для подтверждения удаления поста:");
+                    if (passwordInput === post.password) {
+                        deletePost(index);
+                    } else {
+                        alert("Неверный пароль. Пост не удален.");
+                    }
                 };
-                newPost.appendChild(deleteButton);
+                postDiv.appendChild(deleteButton);
 
-                postsBoard.appendChild(newPost);
+                postsSection.appendChild(postDiv);
             });
         }
 
@@ -321,24 +376,46 @@
             displayPosts(); // Обновляем отображение
         }
 
-        // Функции для загрузки данных из local storage
+        // Функция для добавления комментария
+        function addComment(postIndex, comment) {
+            const posts = JSON.parse(localStorage.getItem("posts")) || [];
+            if (!posts[postIndex].comments) {
+                posts[postIndex].comments = [];
+            }
+            posts[postIndex].comments.push(comment);
+            localStorage.setItem("posts", JSON.stringify(posts));
+            displayPosts(); // Обновляем отображение
+        }
+
+        // Функция для загрузки сообщений
         function loadMessages() {
             displayMessages();
         }
 
+        // Функция для загрузки профилей
         function loadProfiles() {
             displayProfiles();
         }
 
+        // Функция для загрузки постов
         function loadPosts() {
             displayPosts();
         }
+
+        // Интервал для обновления сообщений и профилей
+        setInterval(function() {
+            loadMessages();
+            loadProfiles();
+            loadPosts();
+        }, 5000); // обновление каждые 5 секунд
     </script>
+
     <footer>
-        &copy; 2024 Помощник с калькулятором
+        <p>2024 &copy; Ваш сайт</p>
     </footer>
 </body>
 </html>
+
 
 
 
