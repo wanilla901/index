@@ -3,419 +3,296 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ВКонтакте 2007 года</title>
+    <title>Squad 316 | Battlefield 2042</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
+        /* Основной фон */
         body {
-            background-color: #e6e6e6; /* Светлый фон */
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            color: #333; /* Темный текст */
-        }
-
-        h1 {
-            text-align: center;
-            color: #2a2a2a; /* Темный заголовок */
-        }
-
-        #container {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            max-width: 1200px; /* Максимальная ширина контейнера */
-            margin: 0 auto; /* Центрирование контейнера */
-        }
-
-        #messageBoard, #profileSection {
-            width: 48%; /* Ширина обеих секций */
-            background-color: white;
-            padding: 10px;
-            border: 1px solid #ccc; /* Легкий бордер */
-            border-radius: 5px; /* Скругленные углы */
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); /* Легкая тень */
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        h2 {
-            font-size: 1.5em;
-            color: #007BFF; /* Синий цвет для заголовков */
-            margin-bottom: 10px;
-        }
-
-        .message, .profile, .post {
-            border: 1px solid #ddd; /* Светлый бордер */
-            padding: 5px;
-            margin-bottom: 5px;
-            border-radius: 3px; /* Скругленные углы */
-            background-color: #f9f9f9; /* Светлый фон для сообщений и профилей */
-        }
-
-        img {
-            max-width: 50px;
-            border-radius: 50%; /* Круглые изображения */
-            float: left; /* Плавающее изображение */
-            margin-right: 10px; /* Отступ справа для текста */
-        }
-
-        .post img {
-            max-width: 100%; /* Изображения в постах будут занимать 100% ширины контейнера */
-            border-radius: 5px; /* Скругленные углы для изображений постов */
-            margin-top: 10px; /* Отступ сверху */
-        }
-
-        input[type="text"], input[type="file"], input[type="password"], input[type="submit"] {
-            width: calc(100% - 12px); /* Учитываем отступы */
-            margin-bottom: 10px;
-            padding: 5px;
-            border-radius: 3px; /* Скругленные углы */
-            border: 1px solid #ccc; /* Легкий бордер */
-        }
-
-        input[type="submit"] {
-            background-color: #007BFF; /* Синий цвет для кнопки */
+            font-family: 'Arial', sans-serif;
+            background: url('static/background.jpg') no-repeat center center/cover;
+            background-attachment: fixed;
             color: white;
-            border: none;
-            cursor: pointer;
+            margin: 0;
+            padding: 0;
+            font-size: 16px;
         }
 
-        input[type="submit"]:hover {
-            background-color: #0056b3; /* Темно-синий при наведении */
+        /* Шапка сайта */
+        header {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px 0;
+            text-align: center;
         }
 
-        .delete-button {
-            background-color: transparent; /* Прозрачный фон */
-            color: #007BFF; /* Синий цвет текста */
-            border: none; /* Без бордера */
-            cursor: pointer; /* Указатель при наведении */
-            font-size: 0.9em; /* Уменьшенный размер шрифта */
-            margin-top: 5px; /* Отступ сверху */
+        header h1 {
+            font-size: 3rem;
+            margin: 0;
+            text-transform: uppercase;
+            font-weight: bold;
+            color: #ff6b00; /* Оранжевый, как в Battlefield */
+            animation: fadeIn 2s ease-out;
         }
 
-        .delete-button:hover {
-            text-decoration: underline; /* Подчеркивание при наведении */
-            color: #0056b3; /* Темно-синий при наведении */
-        }
-
-        .comment {
-            margin-top: 5px; /* Отступ сверху для комментариев */
-            padding: 5px;
-            border: 1px solid #ccc; /* Легкий бордер для комментариев */
-            border-radius: 3px; /* Скругленные углы */
-            background-color: #f0f0f0; /* Светлый фон для комментариев */
-        }
-
-        footer {
-            text-align: center; 
+        /* Навигационное меню */
+        nav {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
             margin-top: 20px;
-            color: #777; /* Светло-серый цвет текста */
         }
+
+        nav a {
+            color: white;
+            font-size: 1.2rem;
+            text-decoration: none;
+            text-transform: uppercase;
+            padding: 10px;
+            transition: background 0.3s ease, transform 0.3s ease;
+        }
+
+        nav a:hover {
+            background: #ff6b00;
+            border-radius: 5px;
+            transform: scale(1.1);
+        }
+
+        /* Разделы */
+        section {
+            padding: 50px 20px;
+            margin: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            text-align: center;
+            display: none;
+        }
+
+        section.active {
+            display: block;
+        }
+
+        section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            animation: fadeInText 1s ease-in-out;
+        }
+
+        /* Для блока новостей */
+        .news-container {
+            margin-top: 20px;
+        }
+
+        .news-container article {
+            background: rgba(255, 255, 255, 0.1);
+            margin: 15px 0;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: left;
+        }
+
+        .news-container h3 {
+            font-size: 1.6rem;
+            color: #ff6b00;
+        }
+
+        .news-container p {
+            font-size: 1.2rem;
+        }
+
+        /* Контакты */
+        .contact-info {
+            font-size: 1.2rem;
+            color: white;
+            margin-top: 20px;
+        }
+
+        .contact-info a {
+            color: #ff6b00;
+            text-decoration: none;
+            font-weight: bold;
+            transition: text-decoration 0.3s ease;
+            margin-right: 15px;
+        }
+
+        .contact-info a:hover {
+            text-decoration: underline;
+        }
+
+        .contact-info p {
+            font-size: 1.3rem;
+            color: #fff;
+            margin-top: 20px;
+        }
+
+        /* Присоединиться */
+        .join-us {
+            background: #00aaff;
+            color: white;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s ease, transform 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .join-us:hover {
+            background: #0088cc;
+            transform: scale(1.1);
+        }
+
+        /* О нас */
+        .about-us {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            color: white;
+            line-height: 1.8;
+        }
+
+        .about-us p {
+            margin: 10px 0;
+        }
+
+        /* Стили для футера */
+        footer {
+            background: rgba(0, 0, 0, 0.9);
+            padding: 20px;
+            text-align: center;
+            color: white;
+        }
+
+        footer a {
+            color: #ff6b00;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Анимации */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeInText {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Мобильная адаптивность */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2rem;
+            }
+
+            nav {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            section {
+                padding: 30px 15px;
+            }
+
+            .join-us {
+                width: 100%;
+                text-align: center;
+            }
+
+            .contact-info a {
+                display: block;
+                margin-top: 10px;
+            }
+        }
+
     </style>
 </head>
 <body>
-    <h1>Помощник с калькулятором</h1>
-    <div id="container">
-        <!-- Область сообщений -->
-        <div id="messageBoard">
-            <h2>Общая доска сообщений</h2>
-            <div id="messages"></div>
-            <form id="messageForm" onsubmit="postMessage(); return false;">
-                <input type="text" id="messageInput" placeholder="Напишите сообщение" required>
-                <input type="submit" value="Отправить сообщение">
-            </form>
-        </div>
 
-        <!-- Область профилей -->
-        <div id="profileSection">
-            <h2>Создание профиля</h2>
-            <form id="profileForm" onsubmit="createProfile(); return false;">
-                <input type="text" id="username" placeholder="Имя пользователя" required>
-                <input type="text" id="bio" placeholder="Краткая информация о себе" required>
-                <input type="password" id="password" placeholder="Пароль" required>
-                <input type="file" id="profilePhoto" accept="image/*">
-                <input type="submit" value="Создать профиль">
-            </form>
-            <div id="profiles"></div>
-        </div>
-    </div>
+    <!-- Шапка сайта -->
+    <header>
+        <h1>Squad 316</h1>
+        <nav>
+            <a href="#" onclick="showSection('news')">Новости</a>
+            <a href="#" onclick="showSection('about')">О нас</a>
+            <a href="#" onclick="showSection('contact')">Контакты</a>
+            <a href="#" onclick="showSection('join')">Присоединиться</a>
+        </nav>
+    </header>
 
-    <h2>Публикация фото</h2>
-    <div id="photoSection">
-        <form id="photoForm" onsubmit="postPhoto(); return false;">
-            <input type="file" id="photoInput" accept="image/*" required>
-            <input type="text" id="photoDescription" placeholder="Описание фотографии" required>
-            <input type="submit" value="Опубликовать фото">
-        </form>
-        <div id="posts"></div>
-    </div>
+    <!-- Раздел новостей -->
+    <section id="news" class="active">
+        <h2>Новости</h2>
+        <div class="news-container">
+            <article>
+                <h3>8.03.2025 - Базовые учения</h3>
+                <p>Отработка основных тактик и стратегий.</p>
+            </article>
+            <article>
+                <h3>9.03.2025 - Полные учения</h3>
+                <p>Полный боевой сценарий с координацией команды.</p>
+            </article>
+            <article>
+                <h3>15.03.2025 - СВО</h3>
+                <p>Специальная военная операция с максимальным уровнем сложности.</p>
+            </article>
+        </div>
+    </section>
+
+    <!-- Раздел о нас -->
+    <section id="about">
+        <h2>О нас</h2>
+        <div class="about-us">
+            <p>Squad 316 - это команда профессионалов, объединённых целью стать лучшими в Battlefield 2042. Мы практикуем командную работу, совершенствуем стратегии и участвуем в еженедельных тренировках. Если ты ищешь сильную команду, которая готова к любым вызовам, то ты попал по адресу!</p>
+        </div>
+    </section>
+
+    <!-- Раздел контактов -->
+    <section id="contact">
+        <h2>Контакты</h2>
+        <div class="contact-info">
+            <p>Связаться с нами можно через Discord:</p>
+            <a href="https://discord.com/users/david12345745" target="_blank">david12345745</a>
+            <a href="https://discord.com/users/s3nsai_sayzy" target="_blank">s3nsai_sayzy</a>
+        </div>
+    </section>
+
+    <!-- Присоединиться -->
+    <section id="join">
+        <h2>Присоединиться к нам</h2>
+        <a href="https://discord.gg/z9SjCV62nb" class="join-us">Присоединиться в Discord</a>
+    </section>
+
+    <!-- Футер -->
+    <footer>
+        <p>&copy; 2025 Squad 316. Все права защищены.</p>
+        <p><a href="#">Политика конфиденциальности</a> | <a href="#">Условия использования</a></p>
+    </footer>
 
     <script>
-        // Загружаем сохраненные сообщения, профили и посты из local storage при загрузке страницы
-        window.onload = function() {
-            loadMessages();
-            loadProfiles();
-            loadPosts();
-        };
-
-        // Функция для публикации сообщения
-        function postMessage() {
-            const messageInput = document.getElementById("messageInput").value;
-            const messages = JSON.parse(localStorage.getItem("messages")) || [];
-
-            // Создание нового сообщения
-            messages.push(messageInput);
-            localStorage.setItem("messages", JSON.stringify(messages));
-            displayMessages();
-            document.getElementById("messageInput").value = ""; // очищаем поле ввода
-        }
-
-        // Функция для отображения сообщений
-        function displayMessages() {
-            const messagesBoard = document.getElementById("messages");
-            messagesBoard.innerHTML = ""; // очищаем текущее содержание
-            const messages = JSON.parse(localStorage.getItem("messages")) || [];
-
-            messages.forEach(function(message, index) {
-                const newMessage = document.createElement("div");
-                newMessage.className = "message";
-                newMessage.textContent = message;
-
-                // Добавляем кнопку удаления
-                const deleteButton = document.createElement("button");
-                deleteButton.textContent = "Удалить";
-                deleteButton.className = "delete-button";
-                deleteButton.onclick = function() {
-                    deleteMessage(index);
-                };
-                newMessage.appendChild(deleteButton);
-                
-                messagesBoard.appendChild(newMessage);
+        function showSection(sectionId) {
+            // Скрыть все секции
+            const sections = document.querySelectorAll('section');
+            sections.forEach(section => {
+                section.classList.remove('active');
             });
+
+            // Показать выбранную секцию
+            const activeSection = document.getElementById(sectionId);
+            activeSection.classList.add('active');
         }
-
-        // Функция для удаления сообщения
-        function deleteMessage(index) {
-            const messages = JSON.parse(localStorage.getItem("messages")) || [];
-            messages.splice(index, 1); // Удаляем сообщение по индексу
-            localStorage.setItem("messages", JSON.stringify(messages));
-            displayMessages(); // Обновляем отображение
-        }
-
-        // Функция для создания профиля
-        function createProfile() {
-            const username = document.getElementById("username").value;
-            const bio = document.getElementById("bio").value;
-            const password = document.getElementById("password").value; // Получаем пароль
-            const profilePhoto = document.getElementById("profilePhoto");
-            const profiles = JSON.parse(localStorage.getItem("profiles")) || [];
-
-            // Создание нового профиля
-            const newProfile = {
-                username: username,
-                bio: bio,
-                password: password, // Сохраняем пароль
-                photo: profilePhoto.files[0] ? URL.createObjectURL(profilePhoto.files[0]) : ''
-            };
-            profiles.push(newProfile);
-            localStorage.setItem("profiles", JSON.stringify(profiles));
-            displayProfiles();
-
-            // Очищаем поля ввода
-            document.getElementById("username").value = "";
-            document.getElementById("bio").value = "";
-            document.getElementById("password").value = "";
-            document.getElementById("profilePhoto").value = "";
-        }
-
-        // Функция для отображения профилей
-        function displayProfiles() {
-            const profilesSection = document.getElementById("profiles");
-            profilesSection.innerHTML = ""; // очищаем текущее содержание
-            const profiles = JSON.parse(localStorage.getItem("profiles")) || [];
-
-            profiles.forEach(function(profile, index) {
-                const profileDiv = document.createElement("div");
-                profileDiv.className = "profile";
-                profileDiv.innerHTML = `<strong>${profile.username}</strong><br>${profile.bio}`;
-                if (profile.photo) {
-                    const img = document.createElement("img");
-                    img.src = profile.photo;
-                    profileDiv.appendChild(img);
-                }
-
-                // Кнопка удаления профиля
-                const deleteButton = document.createElement("button");
-                deleteButton.textContent = "Удалить профиль";
-                deleteButton.className = "delete-button";
-                deleteButton.onclick = function() {
-                    const passwordInput = prompt("Введите пароль для подтверждения удаления профиля:");
-                    if (passwordInput === profile.password) {
-                        deleteProfile(index);
-                    } else {
-                        alert("Неверный пароль. Профиль не удален.");
-                    }
-                };
-                profileDiv.appendChild(deleteButton);
-
-                profilesSection.appendChild(profileDiv);
-            });
-        }
-
-        // Функция для удаления профиля
-        function deleteProfile(index) {
-            const profiles = JSON.parse(localStorage.getItem("profiles")) || [];
-            profiles.splice(index, 1); // Удаляем профиль по индексу
-            localStorage.setItem("profiles", JSON.stringify(profiles));
-            displayProfiles(); // Обновляем отображение
-        }
-
-        // Функция для публикации фото
-        function postPhoto() {
-            const photoInput = document.getElementById("photoInput");
-            const photoDescription = document.getElementById("photoDescription").value;
-            const posts = JSON.parse(localStorage.getItem("posts")) || [];
-
-            // Проверяем, создали ли пользователь профиль
-            const profiles = JSON.parse(localStorage.getItem("profiles")) || [];
-            if (profiles.length === 0) {
-                alert("Вы должны создать профиль для публикации фото.");
-                return; // Прерываем выполнение функции, если нет профиля
-            }
-
-            // Создание нового поста
-            const newPost = {
-                description: photoDescription,
-                photo: photoInput.files[0] ? URL.createObjectURL(photoInput.files[0]) : '',
-                password: profiles[0].password // Сохраняем пароль профиля для проверки
-            };
-            posts.push(newPost);
-            localStorage.setItem("posts", JSON.stringify(posts));
-            displayPosts();
-
-            // Очищаем поля ввода
-            document.getElementById("photoInput").value = "";
-            document.getElementById("photoDescription").value = "";
-        }
-
-        // Функция для отображения постов
-        function displayPosts() {
-            const postsSection = document.getElementById("posts");
-            postsSection.innerHTML = ""; // очищаем текущее содержание
-            const posts = JSON.parse(localStorage.getItem("posts")) || [];
-
-            posts.forEach(function(post, index) {
-                const postDiv = document.createElement("div");
-                postDiv.className = "post";
-                postDiv.innerHTML = `<p>${post.description}</p>`;
-                if (post.photo) {
-                    const img = document.createElement("img");
-                    img.src = post.photo;
-                    postDiv.appendChild(img);
-                }
-
-                // Комментарии
-                const commentsSection = document.createElement("div");
-                commentsSection.className = "comments-section";
-
-                // Форма для добавления комментария
-                const commentForm = document.createElement("form");
-                commentForm.onsubmit = function(event) {
-                    event.preventDefault();
-                    addComment(index, commentInput.value);
-                    commentInput.value = ""; // очищаем поле ввода
-                };
-                
-                const commentInput = document.createElement("input");
-                commentInput.type = "text";
-                commentInput.placeholder = "Напишите комментарий"; 
-                commentForm.appendChild(commentInput);
-                
-                const commentButton = document.createElement("input");
-                commentButton.type = "submit";
-                commentButton.value = "Комментировать";
-                commentForm.appendChild(commentButton);
-
-                // Отображаем комментарии
-                const commentList = document.createElement("div");
-                commentList.className = "comment-list";
-                post.comments = post.comments || [];
-                post.comments.forEach(function(comment) {
-                    const commentDiv = document.createElement("div");
-                    commentDiv.className = "comment";
-                    commentDiv.textContent = comment;
-                    commentList.appendChild(commentDiv);
-                });
-
-                commentsSection.appendChild(commentForm);
-                commentsSection.appendChild(commentList);
-                postDiv.appendChild(commentsSection);
-
-                // Кнопка удаления поста
-                const deleteButton = document.createElement("button");
-                deleteButton.textContent = "Удалить пост";
-                deleteButton.className = "delete-button";
-                deleteButton.onclick = function() {
-                    const passwordInput = prompt("Введите пароль для подтверждения удаления поста:");
-                    if (passwordInput === post.password) {
-                        deletePost(index);
-                    } else {
-                        alert("Неверный пароль. Пост не удален.");
-                    }
-                };
-                postDiv.appendChild(deleteButton);
-
-                postsSection.appendChild(postDiv);
-            });
-        }
-
-        // Функция для удаления поста
-        function deletePost(index) {
-            const posts = JSON.parse(localStorage.getItem("posts")) || [];
-            posts.splice(index, 1); // Удаляем пост по индексу
-            localStorage.setItem("posts", JSON.stringify(posts));
-            displayPosts(); // Обновляем отображение
-        }
-
-        // Функция для добавления комментария
-        function addComment(postIndex, comment) {
-            const posts = JSON.parse(localStorage.getItem("posts")) || [];
-            if (!posts[postIndex].comments) {
-                posts[postIndex].comments = [];
-            }
-            posts[postIndex].comments.push(comment);
-            localStorage.setItem("posts", JSON.stringify(posts));
-            displayPosts(); // Обновляем отображение
-        }
-
-        // Функция для загрузки сообщений
-        function loadMessages() {
-            displayMessages();
-        }
-
-        // Функция для загрузки профилей
-        function loadProfiles() {
-            displayProfiles();
-        }
-
-        // Функция для загрузки постов
-        function loadPosts() {
-            displayPosts();
-        }
-
-        // Интервал для обновления сообщений и профилей
-        setInterval(function() {
-            loadMessages();
-            loadProfiles();
-            loadPosts();
-        }, 5000); // обновление каждые 5 секунд
     </script>
 
-    <footer>
-        <p>2024 &copy; Ваш сайт</p>
-    </footer>
 </body>
 </html>
-
-
-
-
